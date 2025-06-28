@@ -1,8 +1,8 @@
 # Gunakan PHP 8.2 dengan Apache
 FROM php:8.2-apache
 
-# Install ekstensi MySQL
-RUN docker-php-ext-install pdo pdo_mysql
+# Install ekstensi MySQL (PDO dan MySQLi)
+RUN docker-php-ext-install pdo pdo_mysql mysqli
 
 # Aktifkan mod_rewrite jika pakai .htaccess
 RUN a2enmod rewrite
