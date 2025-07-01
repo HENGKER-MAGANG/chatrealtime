@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   if (!empty($nama) && !empty($kode)) {
     // Cek apakah user sudah ada
-    $stmt = $conn->prepare("SELECT id, kode_rahasia FROM users WHERE nama = ?");
+    $stmt = $conn->prepare("SELECT id, nama, kode_rahasia, role FROM users WHERE nama = ?");
     $stmt->bind_param("s", $nama);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -19,7 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $user = $result->fetch_assoc();
       if (password_verify($kode, $user['kode_rahasia'])) {
         $_SESSION['user_id'] = $user['id'];
-        $_SESSION['nama'] = $nama;
+        $_SESSION['nama'] = $user['nama'];
+        $_SESSION['role'] = $user['role']; // ⬅️ Tambahan penting
         header("Location: index.php");
         exit;
       } else {
@@ -28,11 +29,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
       // Belum terdaftar → Buat akun baru
       $kode_hash = password_hash($kode, PASSWORD_DEFAULT);
-      $stmt = $conn->prepare("INSERT INTO users (nama, kode_rahasia) VALUES (?, ?)");
+      $stmt = $conn->prepare("INSERT INTO users (nama, kode_rahasia, role) VALUES (?, ?, 'user')");
       $stmt->bind_param("ss", $nama, $kode_hash);
       if ($stmt->execute()) {
         $_SESSION['user_id'] = $stmt->insert_id;
         $_SESSION['nama'] = $nama;
+        $_SESSION['role'] = 'user'; // ⬅️ Tambahan agar role user baru tersimpan di session
         header("Location: index.php");
         exit;
       } else {
