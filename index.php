@@ -8,10 +8,10 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $current_id = $_SESSION['user_id'];
-$current_name = $_SESSION['username'];
-$current_role = $_SESSION['role'];
+$current_name = $_SESSION['nama'] ?? 'Guest';
+$current_role = $_SESSION['role'] ?? '';
 
-$users = $conn->query("SELECT id, username, is_online FROM users WHERE id != $current_id");
+$users = $conn->query("SELECT id, nama, is_online FROM users WHERE id != $current_id");
 $total_pesan = $conn->query("SELECT COUNT(*) as total FROM messages")->fetch_assoc()['total'];
 $total_user = $conn->query("SELECT COUNT(*) as total FROM users")->fetch_assoc()['total'];
 ?>
@@ -35,86 +35,82 @@ $total_user = $conn->query("SELECT COUNT(*) as total FROM users")->fetch_assoc()
     .message-wrapper {
       display: flex;
       flex-direction: column;
-      max-width: 75%;
-      padding: 0.6rem 1rem;
+      max-width: 80%;
+      padding: 0.75rem 1rem;
       border-radius: 1.25rem;
-      line-height: 1.6;
       font-size: 0.95rem;
+      line-height: 1.6;
       box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-      position: relative;
-      background-color: #f0f0f0;
+      word-break: break-word;
     }
     .sent {
       align-self: flex-end;
-      background-color: #cce4f6;
+      background-color: #dbeafe;
     }
     .received {
       align-self: flex-start;
-      background-color: #f6f6f6;
+      background-color: #f3f4f6;
     }
     .timestamp {
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       color: #6b7280;
-      margin-top: 0.2rem;
       text-align: right;
-      padding-right: 6px;
+      padding-top: 0.25rem;
       display: flex;
       justify-content: flex-end;
-      align-items: center;
       gap: 0.25rem;
     }
     .status-icon {
-      font-size: 0.85rem;
-      margin-left: 2px;
+      font-size: 0.9rem;
     }
   </style>
 </head>
-<body class="bg-[#e6e6e6] text-gray-800">
+<body class="bg-gradient-to-br from-blue-100 to-indigo-200 min-h-screen text-gray-800">
 
-<div class="min-h-screen flex flex-col items-center py-6 px-4">
-  <div class="w-full max-w-4xl bg-white rounded-xl shadow-xl p-6 space-y-6">
+<div class="flex flex-col items-center py-6 px-2 sm:px-4">
+  <div class="w-full max-w-6xl bg-white rounded-xl shadow-xl p-4 sm:p-6 space-y-6">
 
     <div class="flex items-center justify-between flex-wrap gap-3">
       <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
         <i class="bi bi-chat-dots"></i> Hai, <?= htmlspecialchars($current_name) ?>!
       </h2>
-      <div class="flex gap-2">
-        <a href="logout.php" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full text-sm">
-          <i class="bi bi-box-arrow-right"></i> Logout
-        </a>
+      <div class="flex flex-wrap gap-2">
         <?php if ($current_role === 'admin'): ?>
-          <a href="admin_panel.php" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-full text-sm">
+          <a href="admin_panel.php" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1.5 rounded-full text-sm">
             <i class="bi bi-gear-fill"></i> Admin
           </a>
         <?php endif; ?>
+        <a href="logout.php" class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-full text-sm">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
       </div>
     </div>
 
-    <div class="text-sm text-gray-600 flex gap-4">
+    <div class="text-sm text-gray-600 flex flex-wrap gap-4">
       <span><i class="bi bi-chat-left-text"></i> Pesan: <?= $total_pesan ?></span>
       <span><i class="bi bi-people"></i> Pengguna: <?= $total_user ?></span>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="md:col-span-1 bg-gray-100 p-4 rounded-lg shadow-inner">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="bg-gray-100 p-4 rounded-lg shadow-inner">
         <h4 class="font-semibold mb-2 text-gray-700 flex items-center gap-1">
           <i class="bi bi-person-lines-fill"></i> Chat Pribadi:
         </h4>
-        <ul class="space-y-1">
+        <ul class="space-y-2">
           <?php while ($u = $users->fetch_assoc()): ?>
-            <li class="flex items-center gap-1">
+            <li class="flex items-center gap-2">
               <i class="bi bi-circle-fill text-xs <?= $u['is_online'] ? 'text-green-500' : 'text-gray-400' ?>"></i>
               <a href="chat_private.php?user=<?= $u['id'] ?>" class="text-blue-600 hover:underline">
-                <i class="bi bi-person-circle"></i> <?= htmlspecialchars($u['username']) ?>
+                <i class="bi bi-person-circle"></i> <?= htmlspecialchars($u['nama']) ?>
               </a>
             </li>
           <?php endwhile; ?>
         </ul>
       </div>
 
-      <div class="md:col-span-2 flex flex-col gap-4">
+      <div class="lg:col-span-2 flex flex-col gap-4">
         <div class="relative">
-          <div id="chat-box" class="bg-white h-80 overflow-y-auto rounded-lg p-4 border border-gray-300 text-sm">
+          <div id="chat-box" class="bg-white h-[30rem] overflow-y-auto rounded-lg p-3 sm:p-4 border border-gray-300 text-sm">
             <!-- Pesan tampil disini -->
           </div>
           <button id="scroll-down-btn" class="hidden absolute right-4 bottom-4 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full shadow-md">
@@ -122,20 +118,20 @@ $total_user = $conn->query("SELECT COUNT(*) as total FROM users")->fetch_assoc()
           </button>
         </div>
 
-        <form id="chat-form" enctype="multipart/form-data" class="space-y-2">
+        <form id="chat-form" enctype="multipart/form-data" class="flex items-center gap-2 flex-wrap">
           <div class="flex items-center gap-2">
             <button type="button" id="emoji-btn" class="text-blue-500 text-xl">
               <i class="bi bi-emoji-smile"></i>
             </button>
-            <input type="file" name="image" id="image" accept="image/*" class="hidden">
             <label for="image" class="cursor-pointer text-blue-500 text-xl">
               <i class="bi bi-image-fill"></i>
             </label>
-            <input type="text" name="message" id="message" class="flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Tulis pesan..." required>
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full flex items-center gap-1">
-              <i class="bi bi-send"></i>
-            </button>
+            <input type="file" name="image" id="image" accept="image/*" class="hidden">
           </div>
+          <input type="text" name="message" id="message" class="flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 min-w-[150px]" placeholder="Tulis pesan..." required>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full flex items-center gap-1">
+            <i class="bi bi-send"></i>
+          </button>
         </form>
       </div>
     </div>
@@ -146,18 +142,10 @@ $total_user = $conn->query("SELECT COUNT(*) as total FROM users")->fetch_assoc()
   document.addEventListener('DOMContentLoaded', () => {
     const button = document.querySelector('#emoji-btn');
     const input = document.querySelector('#message');
-    const picker = new EmojiButton({
-      position: 'top-end',
-      theme: 'auto'
-    });
+    const picker = new EmojiButton({ position: 'top-end', theme: 'auto' });
 
-    button.addEventListener('click', () => {
-      picker.togglePicker(button);
-    });
-
-    picker.on('emoji', emoji => {
-      input.value += emoji;
-    });
+    button.addEventListener('click', () => picker.togglePicker(button));
+    picker.on('emoji', emoji => input.value += emoji);
 
     const chatBox = document.getElementById('chat-box');
     const scrollBtn = document.getElementById('scroll-down-btn');
@@ -169,11 +157,7 @@ $total_user = $conn->query("SELECT COUNT(*) as total FROM users")->fetch_assoc()
 
     chatBox.addEventListener('scroll', () => {
       const nearBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight < 50;
-      if (nearBottom) {
-        scrollBtn.classList.add('hidden');
-      } else {
-        scrollBtn.classList.remove('hidden');
-      }
+      scrollBtn.classList.toggle('hidden', nearBottom);
     });
   });
 </script>

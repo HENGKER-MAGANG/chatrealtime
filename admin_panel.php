@@ -56,7 +56,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
           <thead class="bg-gray-100 text-gray-700">
             <tr>
               <th class="px-3 py-2 border">ID</th>
-              <th class="px-3 py-2 border">Username</th>
+              <th class="px-3 py-2 border">Nama</th>
+              <th class="px-3 py-2 border">No. HP</th>
+              <th class="px-3 py-2 border">Kode Rahasia</th>
               <th class="px-3 py-2 border">Role</th>
               <th class="px-3 py-2 border">Status</th>
               <th class="px-3 py-2 border">Aksi</th>
@@ -64,12 +66,16 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
           </thead>
           <tbody>
             <?php
-            $result = $conn->query("SELECT id, username, role, banned FROM users");
+            $result = $conn->query("SELECT id, nama, no_hp, secret_code, role, banned FROM users");
             while ($row = $result->fetch_assoc()):
             ?>
             <tr class="border-t">
-              <td class="px-3 py-2 whitespace-nowrap"><?= $row['id'] ?></td>
-              <td class="px-3 py-2 whitespace-nowrap"><?= htmlspecialchars($row['username']) ?></td>
+              <td class="px-3 py-2"><?= $row['id'] ?></td>
+              <td class="px-3 py-2"><?= htmlspecialchars($row['nama']) ?></td>
+              <td class="px-3 py-2"><?= htmlspecialchars($row['no_hp']) ?></td>
+              <td class="px-3 py-2 text-center">
+                <?= empty($row['secret_code']) ? '<span class="text-red-500">Belum Ada</span>' : '<span class="text-green-600">Ada</span>' ?>
+              </td>
               <td class="px-3 py-2 capitalize"><?= $row['role'] ?></td>
               <td class="px-3 py-2">
                 <?php if ($row['banned']): ?>
@@ -119,11 +125,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
           </thead>
           <tbody>
             <?php
-            $result = $conn->query("SELECT messages.id, users.username, messages.message, messages.image, messages.created_at FROM messages JOIN users ON messages.user_id = users.id ORDER BY messages.created_at DESC LIMIT 50");
+            $result = $conn->query("SELECT messages.id, users.nama, messages.message, messages.image, messages.created_at FROM messages JOIN users ON messages.user_id = users.id ORDER BY messages.created_at DESC LIMIT 50");
             while ($msg = $result->fetch_assoc()):
             ?>
             <tr class="border-t">
-              <td class="px-3 py-2 whitespace-nowrap"><?= htmlspecialchars($msg['username']) ?></td>
+              <td class="px-3 py-2 whitespace-nowrap"><?= htmlspecialchars($msg['nama']) ?></td>
               <td class="px-3 py-2 whitespace-normal break-words max-w-xs"><?= htmlspecialchars($msg['message']) ?></td>
               <td class="px-3 py-2">
                 <?php if ($msg['image']): ?>

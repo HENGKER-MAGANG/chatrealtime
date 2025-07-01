@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 $current_id = $_SESSION['user_id'];
 
 // Ambil semua pesan terbaru
-$sql = "SELECT messages.id, messages.message, messages.created_at, messages.image, messages.user_id, users.username 
+$sql = "SELECT messages.id, messages.message, messages.created_at, messages.image, messages.user_id, users.nama 
         FROM messages 
         JOIN users ON messages.user_id = users.id 
         ORDER BY messages.created_at DESC 
@@ -25,7 +25,7 @@ $messages = array_reverse($messages);
 
 // Fungsi untuk mengambil siapa yang sudah baca
 function getReaders($conn, $message_id) {
-  $stmt = $conn->prepare("SELECT users.username FROM message_reads 
+  $stmt = $conn->prepare("SELECT users.nama FROM message_reads 
                           JOIN users ON message_reads.user_id = users.id 
                           WHERE message_reads.message_id = ?");
   $stmt->bind_param("i", $message_id);
@@ -33,7 +33,7 @@ function getReaders($conn, $message_id) {
   $res = $stmt->get_result();
   $names = [];
   while ($row = $res->fetch_assoc()) {
-    $names[] = htmlspecialchars($row['username']);
+    $names[] = htmlspecialchars($row['nama']);
   }
   return $names;
 }
@@ -50,7 +50,7 @@ foreach ($messages as $msg):
   <div class="message-wrapper <?= $messageClass ?>" data-id="<?= $messageId ?>">
     <div class="message <?= $messageClass ?>">
       <div class="font-medium text-gray-800 mb-1">
-        <?= htmlspecialchars($msg['username']) ?>
+        <?= htmlspecialchars($msg['nama']) ?>
       </div>
 
       <?php if (!empty($msg['message'])): ?>
