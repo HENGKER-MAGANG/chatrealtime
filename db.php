@@ -1,5 +1,5 @@
 <?php
-$host = 'x48swggswwk0kgo4ckgkooc0'; // hostname dari MySQL URL internal (tanpa "mysql://")
+$host = 'rkwwoksoosw0s0oo8ocks40g'; // hostname dari MySQL URL internal (tanpa "mysql://")
 $user = 'chat';                     // Normal User
 $pass = 'chat123';                 // Normal User Password
 $dbname = 'chat_db';              // Initial Database
