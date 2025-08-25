@@ -18,7 +18,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 </head>
 <body class="bg-gray-100 text-gray-800">
-  <div class="max-w-6xl mx-auto px-4 py-6">
+  <div class="max-w-7xl mx-auto px-4 py-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
       <h2 class="text-2xl font-bold text-blue-600 flex items-center gap-2">
         <i class="bi bi-shield-lock-fill"></i> Admin Panel
@@ -35,9 +35,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
       $banned_users = $conn->query("SELECT COUNT(*) as total FROM users WHERE banned = 1")->fetch_assoc()['total'];
       $active_users = $total_users - $banned_users;
       ?>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-700">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-700">
         <div class="bg-gray-50 p-3 rounded shadow">
           <strong><?= $total_messages ?></strong> Pesan Grup
+        </div>
+        <div class="bg-gray-50 p-3 rounded shadow">
+          <strong><?= $total_users ?></strong> Total Pengguna
         </div>
         <div class="bg-gray-50 p-3 rounded shadow">
           <strong><?= $active_users ?></strong> Pengguna Aktif
@@ -82,16 +85,43 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                   <span class="text-green-600"><i class="bi bi-check-circle"></i> Aktif</span>
                 <?php endif; ?>
               </td>
-              <td class="px-3 py-2">
+              <td class="px-3 py-2 flex flex-wrap gap-1">
                 <?php if ($row['role'] !== 'admin'): ?>
+                  <!-- Ban / Unban -->
                   <a href="toggle_ban.php?id=<?= $row['id'] ?>"
-                     class="px-3 py-1 rounded-full text-white text-xs font-medium <?= $row['banned'] ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600' ?>"
+                     class="px-2 py-1 rounded text-white text-xs <?= $row['banned'] ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600' ?>"
                      onclick="return confirm('Yakin ingin <?= $row['banned'] ? 'unban' : 'ban' ?> user ini?')">
-                    <i class="bi <?= $row['banned'] ? 'bi-unlock' : 'bi-lock-fill' ?>"></i> <?= $row['banned'] ? 'Unban' : 'Ban' ?>
+                    <i class="bi <?= $row['banned'] ? 'bi-unlock' : 'bi-lock-fill' ?>"></i>
+                  </a>
+
+                  <!-- Jadikan Admin -->
+                  <a href="ubah_role.php?id=<?= $row['id'] ?>&role=admin"
+                     class="px-2 py-1 rounded text-white text-xs bg-blue-500 hover:bg-blue-600"
+                     onclick="return confirm('Jadikan user ini admin?')">
+                    <i class="bi bi-shield-plus"></i>
+                  </a>
+
+                  <!-- Hapus User -->
+                  <a href="hapus_user.php?id=<?= $row['id'] ?>"
+                     class="px-2 py-1 rounded text-white text-xs bg-gray-600 hover:bg-gray-700"
+                     onclick="return confirm('Hapus user ini beserta semua pesannya?')">
+                    <i class="bi bi-trash"></i>
                   </a>
                 <?php else: ?>
                   <span class="text-gray-400 text-xs">-</span>
                 <?php endif; ?>
+
+                <!-- Pantau Chat Grup -->
+                <a href="pantau_chat.php?id=<?= $row['id'] ?>"
+                   class="px-2 py-1 rounded text-white text-xs bg-purple-500 hover:bg-purple-600">
+                   <i class="bi bi-chat-dots"></i>
+                </a>
+
+                <!-- Pantau Chat Pribadi -->
+                <a href="pantau_private.php?id=<?= $row['id'] ?>"
+                   class="px-2 py-1 rounded text-white text-xs bg-pink-500 hover:bg-pink-600">
+                   <i class="bi bi-envelope-open"></i>
+                </a>
               </td>
             </tr>
             <?php endwhile; ?>
